@@ -427,7 +427,7 @@ services:
         - "7474:7474"
         - "1337:1337"
       environment:
-        - NEO4J_AUTH=default:secret
+        - NEO4J_AUTH=neo4j:neo4j
       volumes:
         - ${DATA_PATH_HOST}/neo4j:/var/lib/neo4j/data
       networks:
