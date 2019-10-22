@@ -738,22 +738,28 @@ services:
 
 ### ElasticSearch ########################################
     elasticsearch:
-      build: ./elasticsearch
+      build: 
+        context: ./elasticsearch
+        args:
+          - ELASTICSEARCH_VERSION=${ELASTICSEARCH_VERSION}
       volumes:
         - elasticsearch:/usr/share/elasticsearch/data
       environment:
-        - cluster.name=laradock-cluster
-        - node.name=laradock-node
-        - bootstrap.memory_lock=true
-        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-        - cluster.initial_master_nodes=laradock-node
+        - cluster.name=${ELASTICSEARCH_CLUSTER}
+        - node.name=${ELASTICSEARCH_NODE}
+        # - bootstrap.memory_lock=true
+        - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+        # - cluster.initial_master_nodes=${ELASTICSEARCH_NODE}
+        - http.cors.enabled=true
+        - http.cors.allow-origin=*
+        - xpack.security.enabled=false
       ulimits:
         memlock:
           soft: -1
           hard: -1
       ports:
         - "${ELASTICSEARCH_HOST_HTTP_PORT}:9200"
-        - "${ELASTICSEARCH_HOST_TRANSPORT_PORT}:9300"
+        # - "${ELASTICSEARCH_HOST_TRANSPORT_PORT}:9300"
       depends_on:
         - php-fpm
       networks:
