@@ -708,7 +708,11 @@ ARG INSTALL_MYSQL_CLIENT=false
 
 RUN if [ ${INSTALL_MYSQL_CLIENT} = true ]; then \
     apt-get update -yqq && \
-    apt-get -y install mysql-client \
+    if [ ${LARADOCK_PHP_VERSION} = "7.3" ]; then \
+      apt-get -y install default-mysql-client \
+    ;else \
+      apt-get -y install mysql-client \
+    ;fi \
 ;fi
 
 ###########################################################################
@@ -785,7 +789,14 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm /var/log/lastlog /var/log/faillog
 
-RUN usermod -u 1000 www-data
+# Configure non-root user.
+ARG PUID=1000
+ENV PUID ${PUID}
+ARG PGID=1000
+ENV PGID ${PGID}
+
+RUN groupmod -o -g ${PGID} www-data && \
+    usermod -o -u ${PUID} -g www-data www-data
 
 # Adding the faketime library to the preload file needs to be done last
 # otherwise it will preload it for all commands that follow in this file
